@@ -17,6 +17,9 @@ use App\Http\Controllers\UserController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('api/users', [UserController::class, 'index']);
 
+Route::prefix('api')->group(function () {
+    Route::get('list/users', [UserController::class, 'index']);
+    Route::post('create/users', [UserController::class, 'create']);
+});
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
