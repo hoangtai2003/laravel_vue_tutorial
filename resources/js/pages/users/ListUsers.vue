@@ -54,47 +54,46 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form>
+                <Form @submit="createUser" :validation-schema="schema" v-slot="{ errors }">
+                    <div class="modal-body">
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input name="name" type="text" class="form-control" v-model="form.name"
+                            <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
                                    id="name" aria-describedby="nameHelp" placeholder="Enter full name" />
-                            <span class="invalid-feedback"></span>
+                            <span class="invalid-feedback">{{ errors.name }}</span>
                         </div>
 
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input name="email" type="email" class="form-control " v-model="form.email"
+                            <Field name="email" type="email" class="form-control "
+                                   :class="{ 'is-invalid': errors.email }" id="email" aria-describedby="nameHelp"
                                    placeholder="Enter full name" />
-                            <span class="invalid-feedback"></span>
+                            <span class="invalid-feedback">{{ errors.email }}</span>
                         </div>
 
                         <div class="form-group">
                             <label for="email">Password</label>
-                            <input name="password" type="password" class="form-control " v-model="form.password"
+                            <Field name="password" type="password" class="form-control "
+                                   :class="{ 'is-invalid': errors.password }" id="password" aria-describedby="nameHelp"
                                    placeholder="Enter password" />
-                            <span class="invalid-feedback"></span>
+                            <span class="invalid-feedback">{{ errors.password }}</span>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" @click="createUser" class="btn btn-primary">Save</button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </Form>
             </div>
         </div>
     </div>
 </template>
 <script setup>
     import axios from "axios";
-    import {onMounted, reactive, ref} from "vue";
+    import { onMounted, reactive, ref } from "vue";
+    import { Form, Field } from 'vee-validate';
+    import * as yup from 'yup';
     let users = ref([])
-    const form = reactive({
-        name: '',
-        email: '',
-        password: ''
-    })
 
 
     const getUser = () => {
@@ -104,17 +103,19 @@
                 users.value = response.data
         })
     }
-    const createUser = () => {
-        axios.post('/api/create/users', form)
+
+    const createUser = (values) => {
+        axios.post('/api/create/users', values)
             .then((response) => {
-                //Thêm dữ liệu của user mới vào mảng users, response.data chứa dữ liệu của user mới mà máy chủ trả về sau khi tạo user thành công
-                users.value.push(response.data)
-                form.name = '';
-                form.email = '';
-                form.password = '';
+                getUser()
                 $('#createUserModal').modal('hide')
             })
     }
+    const schema = yup.object({
+        name: yup.string().required(),
+        email: yup.string().required(),
+        password: yup.string().required()
+    })
     // Gọi lại hàm getUser() khi component được mounted
     onMounted(() => {
         getUser()
