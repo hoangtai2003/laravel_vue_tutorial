@@ -14,9 +14,9 @@ class UserController extends Controller
     }
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'string|min:6',
+            'name' => 'required',
+            'email' => 'required|unique:users,email',
+            'password' => 'required|min:8',
         ]);
 
         if ($validator -> fails()){
@@ -35,7 +35,9 @@ class UserController extends Controller
 
     public function update(Request $request, User $user){
         $request -> validate([
+            'name' => 'required',
             'email' => 'required|unique:users,email,'.$user->id,
+            'password' => 'sometimes|min:8',
         ]);
         $user -> update([
             'name' => $request->input('name'),
