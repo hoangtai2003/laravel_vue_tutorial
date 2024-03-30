@@ -46,4 +46,8 @@ class UserController extends Controller
         ]);
         return $user;
     }
+    public function destroy(User $user){
+        $user -> delete();
+        return response()->json(['message' => 'Product deleted successfully']);
+    }
 }
