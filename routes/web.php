@@ -21,5 +21,6 @@ Route::get('/', function () {
 Route::prefix('api')->group(function () {
     Route::get('list/users', [UserController::class, 'index']);
     Route::post('create/users', [UserController::class, 'create']);
+    Route::put('update/users/{user}', [UserController::class, 'update']);
 });
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');

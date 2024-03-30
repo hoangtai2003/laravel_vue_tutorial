@@ -16,7 +16,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => 'string|min:6',
         ]);
 
         if ($validator -> fails()){
@@ -31,6 +31,14 @@ class UserController extends Controller
             'message' => 'User successfully registered',
             'user' => $user
         ], 201);
+    }
 
+    public function update(Request $request, User $user){
+        $user -> update([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password'))
+        ]);
+        return $user;
     }
 }
