@@ -94,7 +94,9 @@
     import axios from "axios";
     import { onMounted, ref } from "vue";
     import { Form, Field } from 'vee-validate';
-    import * as yup from 'yup';
+    import { useToastr } from "@/toastr";
+
+    const toastr = useToastr();
     const users = ref([])
     const editing = ref(false)
     const formValues = ref({
@@ -110,11 +112,17 @@
         })
     }
     const createUser = (values) => {
-        axios.post('/api/create/users', values)
-            .then((response) => {
-                getUser()
-                $('#userFormModal').modal('hide')
-            })
+        try{
+            axios.post('/api/create/users', values)
+                .then((response) => {
+                    getUser()
+                    $('#userFormModal').modal('hide')
+                })
+            toastr.success("User create successfully!")
+        } catch (error){
+            toastr.error("User creation failed")
+        }
+
     }
     const editUser = (user) => {
         editing.value = true
@@ -136,11 +144,16 @@
         }
     }
     const updateUser = (values) => {
-        axios.put('/api/update/users/' + formValues.value.id, values)
-            .then((response) => {
-                getUser()
-                $('#userFormModal').modal('hide')
-            })
+        try{
+            axios.put('/api/update/users/' + formValues.value.id, values)
+                .then((response) => {
+                    getUser()
+                    $('#userFormModal').modal('hide')
+                })
+            toastr.success("User update successfully!")
+        } catch (error){
+            toastr.error("User update failed")
+        }
     }
     const handleSubmit = (values) => {
         if (editing.value) {
@@ -151,6 +164,6 @@
     }
     // Gọi lại hàm getUser() khi component được mounted
     onMounted(() => {
-        getUser()
+        getUser();
     })
 </script>
