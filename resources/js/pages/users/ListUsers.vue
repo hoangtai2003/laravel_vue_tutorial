@@ -28,6 +28,7 @@
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Registered Date</th>
+                            <th scope="col">Role</th>
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
@@ -37,6 +38,7 @@
                             <td>{{user.name}}</td>
                             <td>{{user.email}}</td>
                             <td>{{user.formatted_created_at}}</td>
+                            <td>{{user.role}}</td>
                             <td>
                                 <a href="#" @click.prevent="editUser(user)">
                                     <i class="fa fa-edit"></i>
