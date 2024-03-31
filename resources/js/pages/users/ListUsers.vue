@@ -1,6 +1,6 @@
 <script setup>
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import {onMounted, ref, watch} from "vue";
 import { Form, Field } from 'vee-validate';
 import { useToastr } from "@/toastr";
 import ListUserItems from "@/pages/users/ListUserItems.vue";
@@ -13,6 +13,7 @@ const formValues = ref({
     email: '',
     password: ''
 })
+const searchQuery = ref(null)
 const getUser = () => {
     axios.get('/api/users/list')
         // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
@@ -51,7 +52,7 @@ const addUser = () => {
     }
 }
 const updateUser = (values) => {
-    axios.put('/api/users/update/' + formValues.value.id, values)
+    axios.put('/api/users/update    /' + formValues.value.id, values)
         .then(response => {
             getUser()
             $('#userFormModal').modal('hide')
@@ -71,6 +72,20 @@ const userDeleted = (userId) => {
     // Kiểm tra xem id của người dùng hiện tại có trùng với id cần xóa hay không nếu có sẽ giữ lại nếu không sẽ loại bỏ khỏi mảng
     users.value = users.value.filter(user => user.id !== userId);
 }
+const search = () => {
+    axios.get('/api/users/search', {
+        params: {
+            searchQuery: searchQuery.value
+        }
+    }).then((response) => {
+        users.value = response.data
+    }).catch((error) => {
+        console.error(error);
+    })
+}
+watch(searchQuery, () => {
+    search()
+})
 // Gọi lại hàm getUser() khi component được mounted
 onMounted(() => {
     getUser();
@@ -94,9 +109,15 @@ onMounted(() => {
     </div>
     <div class="content">
         <div class="container-fluid">
-            <button @click="addUser" type="button" class="mb-2 btn btn-primary" >
-                Add new User
-            </button>
+            <div class="d-flex justify-content-between">
+                <button @click="addUser" type="button" class="mb-2 btn btn-primary" >
+                    Add new User
+                </button>
+                <div>
+                    <input type="text" class="form-control" placeholder="Search..." v-model="searchQuery">
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -110,12 +131,17 @@ onMounted(() => {
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="users.length > 0">
                             <ListUserItems v-for="user in users"
                                            :key="user.id"
                                            :user=user
                                            @edit-user="editUser"
                                            @user-deleted="userDeleted"/>
+                        </tbody>
+                        <tbody v-else>
+                            <tr>
+                                <td colspan="6">No results found .... </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

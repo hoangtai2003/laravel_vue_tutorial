@@ -57,4 +57,11 @@ class UserController extends Controller
         ]);
         return response() -> json(['success' => true]);
     }
+
+    public function search(){
+        $querySearch = request('searchQuery');
+        $user = User::where('name', 'like', "%{$querySearch}%")->get();
+
+        return response() -> json($user);
+    }
 }

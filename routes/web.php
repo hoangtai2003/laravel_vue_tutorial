@@ -24,5 +24,6 @@ Route::prefix('api')->group(function () {
     Route::put('users/update/{user}', [UserController::class, 'update']);
     Route::delete('users/destroy/{user}', [UserController::class, 'destroy']);
     Route::patch('users/change-role/{user}', [UserController::class, 'changeRole']);
+    Route::get('users/search', [UserController::class, 'search']);
 });
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
