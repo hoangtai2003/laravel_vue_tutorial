@@ -37,7 +37,7 @@ class UserController extends Controller
         $request -> validate([
             'name' => 'required',
             'email' => 'required|unique:users,email,'.$user->id,
-            'password' => 'sometimes|min:8',
+            'password' => 'min:8|nullable',
         ]);
         $user -> update([
             'name' => $request->input('name'),

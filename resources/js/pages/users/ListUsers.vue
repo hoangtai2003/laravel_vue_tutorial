@@ -1,3 +1,81 @@
+<script setup>
+import axios from "axios";
+import { onMounted, ref } from "vue";
+import { Form, Field } from 'vee-validate';
+import { useToastr } from "@/toastr";
+import ListUserItems from "@/pages/users/ListUserItems.vue";
+
+const toastr = useToastr();
+const users = ref([])
+const editing = ref(false)
+const formValues = ref({
+    name: '',
+    email: '',
+    password: ''
+})
+const getUser = () => {
+    axios.get('/api/list/users')
+        // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
+        .then((response) => {
+            users.value = response.data
+        })
+}
+const createUser = (values) => {
+    axios.post('/api/create/users', values)
+        .then((response) => {
+            getUser()
+            $('#userFormModal').modal('hide')
+            toastr.success("User update successfully!")
+        }).catch((error) => {
+        toastr.error("User creation failed")
+    })
+
+}
+const editUser = (user) => {
+    editing.value = true
+    $('#userFormModal').modal('show')
+    formValues.value = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password: ''
+    }
+}
+const addUser = () => {
+    editing.value = false
+    $('#userFormModal').modal('show')
+    formValues.value = {
+        name: '',
+        email: '',
+        password: ''
+    }
+}
+const updateUser = (values) => {
+    axios.put('/api/update/users/' + formValues.value.id, values)
+        .then(response => {
+            getUser()
+            $('#userFormModal').modal('hide')
+            toastr.success("User update successfully!")
+        }).catch(error => {
+        toastr.error("User update failed")
+    })
+}
+const handleSubmit = (values) => {
+    if (editing.value) {
+        updateUser(values)
+    } else {
+        createUser(values)
+    }
+}
+const userDeleted = (userId) => {
+    // Kiểm tra xem id của người dùng hiện tại có trùng với id cần xóa hay không nếu có sẽ giữ lại nếu không sẽ loại bỏ khỏi mảng
+    users.value = users.value.filter(user => user.id !== userId);
+}
+// Gọi lại hàm getUser() khi component được mounted
+onMounted(() => {
+    getUser();
+})
+</script>
 <template>
     <div class="content-header">
         <div class="container-fluid">
@@ -33,21 +111,11 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="user in users" :key="user.id">
-                            <th scope="row">{{user.id}}</th>
-                            <td>{{user.name}}</td>
-                            <td>{{user.email}}</td>
-                            <td>{{user.formatted_created_at}}</td>
-                            <td>{{user.role}}</td>
-                            <td>
-                                <a href="#" @click.prevent="editUser(user)">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a href="#" @click.prevent="confirmDeleteUser(user)">
-                                    <i class="fa fa-trash  text-danger ml-2"></i>
-                                </a>
-                            </td>
-                        </tr>
+                            <ListUserItems v-for="user in users"
+                                           :key="user.id"
+                                           :user=user
+                                           @edit-user="editUser"
+                                           @user-deleted="userDeleted"/>
                         </tbody>
                     </table>
                 </div>
@@ -96,117 +164,4 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
-         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">
-                        <span>Delete User</span>
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h5>Are you sure you want to delete this user ?</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button @click.prevent="deleteUser" type="button" class="btn btn-primary">Delete User</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </template>
-<script setup>
-    import axios from "axios";
-    import { onMounted, ref } from "vue";
-    import { Form, Field } from 'vee-validate';
-    import { useToastr } from "@/toastr";
-
-    const toastr = useToastr();
-    const users = ref([])
-    const editing = ref(false)
-    const formValues = ref({
-        name: '',
-        email: '',
-        password: ''
-    })
-    const userDeleted = ref(null)
-    const getUser = () => {
-        axios.get('/api/list/users')
-            // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
-            .then((response) => {
-                users.value = response.data
-        })
-    }
-    const createUser = (values) => {
-        axios.post('/api/create/users', values)
-            .then((response) => {
-                getUser()
-                $('#userFormModal').modal('hide')
-                toastr.success("User update successfully!")
-            }).catch((error) => {
-            toastr.error("User creation failed")
-        })
-
-    }
-    const editUser = (user) => {
-        editing.value = true
-        $('#userFormModal').modal('show')
-        formValues.value = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            password: ''
-        }
-    }
-    const addUser = () => {
-        editing.value = false
-        $('#userFormModal').modal('show')
-        formValues.value = {
-            name: '',
-            email: '',
-            password: ''
-        }
-    }
-    const updateUser = (values) => {
-        axios.put('/api/update/users/' + formValues.value.id, values)
-            .then(response => {
-                getUser()
-                $('#userFormModal').modal('hide')
-                toastr.success("User update successfully!")
-            }).catch(error => {
-                toastr.error("User update failed")
-        })
-    }
-    const confirmDeleteUser = (user) => {
-        //Đặt giá trị userDeleted thành id của người dùng cần xóa
-        userDeleted.value = user.id
-        $('#deleteUserModal').modal('show')
-    }
-    const deleteUser = () => {
-        axios.delete(`/api/destroy/users/${userDeleted.value}`)
-            .then(response => {
-                // Kiểm tra xem id của người dùng hiện tại có trùng với id cần xóa hay không nếu có sẽ giữ lại nếu không sẽ loại bỏ khỏi mảng
-                users.value = users.value.filter(user => user.id !== userDeleted.value);
-                getUser()
-                $('#deleteUserModal').modal('hide')
-                toastr.success("Delete user successfully!")
-            }).catch(error => {
-                toastr.error("Error deleting user:")
-        });
-    }
-    const handleSubmit = (values) => {
-        if (editing.value) {
-            updateUser(values)
-        } else {
-            createUser(values)
-        }
-    }
-    // Gọi lại hàm getUser() khi component được mounted
-    onMounted(() => {
-        getUser();
-    })
-</script>
