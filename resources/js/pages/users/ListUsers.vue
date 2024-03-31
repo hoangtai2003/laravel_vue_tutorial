@@ -14,14 +14,14 @@ const formValues = ref({
     password: ''
 })
 const getUser = () => {
-    axios.get('/api/list/users')
+    axios.get('/api/users/list')
         // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
         .then((response) => {
             users.value = response.data
         })
 }
 const createUser = (values) => {
-    axios.post('/api/create/users', values)
+    axios.post('/api/users/create', values)
         .then((response) => {
             getUser()
             $('#userFormModal').modal('hide')
@@ -51,7 +51,7 @@ const addUser = () => {
     }
 }
 const updateUser = (values) => {
-    axios.put('/api/update/users/' + formValues.value.id, values)
+    axios.put('/api/users/update/' + formValues.value.id, values)
         .then(response => {
             getUser()
             $('#userFormModal').modal('hide')

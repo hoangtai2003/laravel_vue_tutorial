@@ -6,6 +6,16 @@
     defineProps({
         user: Object
     })
+    const roles = ref([
+        {
+            name: 'USER',
+            value: 2
+        },
+        {
+            name: 'ADMIN',
+            value: 1
+        }
+    ])
     const users = ref([])
     const toastr = useToastr();
     const userIdBeingDeleted = ref(null)
@@ -16,7 +26,7 @@
         $('#deleteUserModal').modal('show')
     }
     const deleteUser = () => {
-        axios.delete(`/api/destroy/users/${userIdBeingDeleted.value}`)
+        axios.delete(`/api/users/destroy/${userIdBeingDeleted.value}`)
             .then(response => {
                 getUser()
                 $('#deleteUserModal').modal('hide')
@@ -27,7 +37,7 @@
         });
     }
     const getUser = () => {
-        axios.get('/api/list/users')
+        axios.get('/api/users/list')
             // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
             .then((response) => {
                 users.value = response.data
@@ -36,7 +46,14 @@
     const editUser = (user) => {
         emit("editUser", user)
     }
+    const changeRole = (user, role) => {
+        axios.patch(`/api/users/change-role/${user.id}`, {
+            role: role,
+        }).then(() => {
+            toastr.success("Change role successfully!")
+        })
 
+    }
 </script>
 <template>
     <tr>
@@ -44,7 +61,13 @@
         <td>{{user.name}}</td>
         <td>{{user.email}}</td>
         <td>{{user.formatted_created_at}}</td>
-        <td>{{user.role}}</td>
+        <td>
+            <!-- $event.target.value: giá trị mới được chọn trong selecbox            -->
+            <select class="form-control" @change="changeRole(user, $event.target.value)">
+                <!--value="role.value" Đặt giá trị của mỗi tùy chọn trong select box bằng giá trị của thuộc tính value của đối tượng role.             -->
+                <option v-for="role in roles" :value="role.value" :selected="(user.role === role.name)" >{{role.name}}</option>
+            </select>
+        </td>
         <td>
             <a href="#" @click.prevent="editUser(user)">
                 <i class="fa fa-edit"></i>

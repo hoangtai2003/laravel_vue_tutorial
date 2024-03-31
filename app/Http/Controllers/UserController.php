@@ -50,4 +50,11 @@ class UserController extends Controller
         $user -> delete();
         return response()->json(['message' => 'Product deleted successfully']);
     }
+
+    public function changeRole(User $user){
+        $user -> update([
+           'role' =>  request('role')
+        ]);
+        return response() -> json(['success' => true]);
+    }
 }
