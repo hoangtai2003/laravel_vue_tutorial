@@ -1,63 +1,7 @@
-<script setup>
-    import axios from "axios";
-    import { useToastr } from "@/toastr";
-    import { ref } from "vue";
-
-    defineProps({
-        user: Object
-    })
-    const roles = ref([
-        {
-            name: 'USER',
-            value: 2
-        },
-        {
-            name: 'ADMIN',
-            value: 1
-        }
-    ])
-    const users = ref([])
-    const toastr = useToastr();
-    const userIdBeingDeleted = ref(null)
-    const emit = defineEmits(['userDeleted', 'editUser'])
-    const confirmDeleteUser = (user) => {
-        //Đặt giá trị userIdBeingDeleted thành id của người dùng cần xóa
-        userIdBeingDeleted.value = user.id
-        $('#deleteUserModal').modal('show')
-    }
-    const deleteUser = () => {
-        axios.delete(`/api/users/destroy/${userIdBeingDeleted.value}`)
-            .then(response => {
-                getUser()
-                $('#deleteUserModal').modal('hide')
-                toastr.success("Delete user successfully!")
-                emit("userDeleted", userIdBeingDeleted.value)
-            }).catch(error => {
-                toastr.error("Error deleting user")
-        });
-    }
-    const getUser = () => {
-        axios.get('/api/users/list')
-            // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
-            .then((response) => {
-                users.value = response.data
-            })
-    }
-    const editUser = (user) => {
-        emit("editUser", user)
-    }
-    const changeRole = (user, role) => {
-        axios.patch(`/api/users/change-role/${user.id}`, {
-            role: role,
-        }).then(() => {
-            toastr.success("Change role successfully!")
-        })
-
-    }
-</script>
 <template>
     <tr>
-        <th scope="row">{{user.id}}</th>
+        <td><input type="checkbox" @change="toggleSelection" :checked="selectAll"></td>
+        <th scope="row">{{index + 1}}</th>
         <td>{{user.name}}</td>
         <td>{{user.email}}</td>
         <td>{{user.formatted_created_at}}</td>
@@ -101,3 +45,66 @@
     </div>
 
 </template>
+<script setup>
+import axios from "axios";
+import { useToastr } from "@/toastr";
+import { ref } from "vue";
+
+const props = defineProps({
+    user: Object,
+    index: Number,
+    selectAll: {type: Boolean, default: false}
+})
+const roles = ref([
+    {
+        name: 'USER',
+        value: 2
+    },
+    {
+        name: 'ADMIN',
+        value: 1
+    }
+])
+const users = ref([])
+const toastr = useToastr();
+const userIdBeingDeleted = ref(null)
+const emit = defineEmits(['userDeleted', 'editUser', 'toggleSelection'])
+const toggleSelection = () => {
+
+    emit('toggleSelection', props.user)
+}
+const confirmDeleteUser = (user) => {
+    //Đặt giá trị userIdBeingDeleted thành id của người dùng cần xóa
+    userIdBeingDeleted.value = user.id
+    $('#deleteUserModal').modal('show')
+}
+const deleteUser = () => {
+    axios.delete(`/api/users/destroy/${userIdBeingDeleted.value}`)
+        .then(response => {
+            getUser()
+            $('#deleteUserModal').modal('hide')
+            toastr.success("Delete user successfully!")
+            emit("userDeleted", userIdBeingDeleted.value)
+        }).catch(error => {
+        toastr.error("Error deleting user")
+    });
+}
+const getUser = () => {
+    axios.get('/api/users/list')
+        // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
+        .then((response) => {
+            users.value = response.data
+        })
+}
+const editUser = (user) => {
+    emit("editUser", user)
+}
+const changeRole = (user, role) => {
+    axios.patch(`/api/users/change-role/${user.id}`, {
+        role: role,
+    }).then(() => {
+        toastr.success("Change role successfully!")
+    })
+
+}
+</script>

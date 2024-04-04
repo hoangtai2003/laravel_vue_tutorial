@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
     public function index(){
-        $users = User::all();
+        $users = DB::table('users')->latest()->paginate(2);
         return $users;
     }
     public function create(Request $request){
@@ -55,13 +56,17 @@ class UserController extends Controller
         $user -> update([
            'role' =>  request('role')
         ]);
-        return response() -> json(['success' => true]);
+        return response()->json(['success' => true]);
     }
 
     public function search(){
         $querySearch = request('searchQuery');
-        $user = User::where('name', 'like', "%{$querySearch}%")->get();
+        $user = User::where('name', 'like', "%{$querySearch}%")->paginate(2);
 
-        return response() -> json($user);
+        return response()->json($user);
+    }
+    public function bulkDelete(){
+        User::whereIn('id', request('ids'))->delete();
+        return response()->json(['message' => 'Users deleted successfully!']);
     }
 }

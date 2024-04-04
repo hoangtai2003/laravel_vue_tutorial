@@ -19,11 +19,14 @@ Route::get('/', function () {
 });
 
 Route::prefix('api')->group(function () {
-    Route::get('users/list', [UserController::class, 'index']);
-    Route::post('users/create', [UserController::class, 'create']);
-    Route::put('users/update/{user}', [UserController::class, 'update']);
-    Route::delete('users/destroy/{user}', [UserController::class, 'destroy']);
-    Route::patch('users/change-role/{user}', [UserController::class, 'changeRole']);
-    Route::get('users/search', [UserController::class, 'search']);
+    Route::prefix('users')->group(function (){
+        Route::get('list', [UserController::class, 'index']);
+        Route::post('create', [UserController::class, 'create']);
+        Route::put('update/{user}', [UserController::class, 'update']);
+        Route::delete('destroy/{user}', [UserController::class, 'destroy']);
+        Route::patch('change-role/{user}', [UserController::class, 'changeRole']);
+        Route::get('search', [UserController::class, 'search']);
+        Route::delete('', [UserController::class, 'bulkDelete']);
+    });
 });
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
