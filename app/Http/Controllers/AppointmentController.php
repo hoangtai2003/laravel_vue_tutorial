@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
 
 class AppointmentController extends Controller
@@ -9,6 +10,9 @@ class AppointmentController extends Controller
     public function list(){
         return Appointment::query()
             ->with('client:id,first_name,last_name')
+            ->when(request('status'), function ($query){
+                return $query->where('status', AppointmentStatus::from(request('status')));
+            })
             ->latest()
             ->get()
             // map() được gọi trên Collection để chuyển đổi từng phần tử

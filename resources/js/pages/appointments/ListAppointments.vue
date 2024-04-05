@@ -25,18 +25,24 @@
                             <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Appointment</button>
                         </div>
                         <div class="btn-group">
-                            <button  type="button" class="btn btn-secondary">
+                            <button @click="getAppointment()" type="button" class="btn btn-secondary">
                                 <span class="mr-1">All</span>
                                 <span class="badge badge-pill badge-info">1</span>
                             </button>
 
-                            <button type="button" class="btn btn-default">
+                            <button @click="getAppointment(appointmentStatus.scheduled)" type="button" class="btn btn-default">
                                 <span class="mr-1">Scheduled</span>
                                 <span class="badge badge-pill badge-primary">0</span>
                             </button>
-                            <button type="button" class="btn btn-default">
-                                <span class="mr-1">Closed</span>
-                                <span class="badge badge-pill badge-success">1</span>
+
+                            <button @click="getAppointment(appointmentStatus.confirmed)"  type="button" class="btn btn-default">
+                                <span class="mr-1">Confirmed</span>
+                                <span class="badge badge-pill badge-success">0</span>
+                            </button>
+
+                            <button @click="getAppointment(appointmentStatus.cancelled)"  type="button" class="btn btn-default">
+                                <span class="mr-1">Cancelled</span>
+                                <span class="badge badge-pill badge-danger">0</span>
                             </button>
                         </div>
                     </div>
@@ -87,8 +93,15 @@
 import axios from "axios";
 import {onMounted, ref} from "vue";
 const appointments = ref([])
-const getAppointment = async () => {
-    const response = await axios.get('/api/appointments/list')
+const appointmentStatus = {'scheduled': 1, 'confirmed': 2, 'cancelled': 3}
+const getAppointment = async (status) => {
+    const params = {};
+    if (status){
+        params.status = status
+    }
+    const response = await axios.get('/api/appointments/list', {
+        params: params
+    })
     appointments.value = response.data
 }
 onMounted(()=> {
