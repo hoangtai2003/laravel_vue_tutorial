@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class UserController extends Controller
 {
     public function index(){
-        $users = DB::table('users')->latest()->paginate(2);
+        $users = User::latest()->get();
         return $users;
     }
     public function create(Request $request){
@@ -61,7 +61,7 @@ class UserController extends Controller
 
     public function search(){
         $querySearch = request('searchQuery');
-        $user = User::where('name', 'like', "%{$querySearch}%")->paginate(2);
+        $user = User::where('name', 'like', "%{$querySearch}%");
 
         return response()->json($user);
     }

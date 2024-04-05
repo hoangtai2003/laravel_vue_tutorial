@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AppointmentController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,6 +28,10 @@ Route::prefix('api')->group(function () {
         Route::patch('change-role/{user}', [UserController::class, 'changeRole']);
         Route::get('search', [UserController::class, 'search']);
         Route::delete('', [UserController::class, 'bulkDelete']);
+    });
+
+    Route::prefix('appointments')->group(function (){
+       Route::get('list', [AppointmentController::class, 'list']);
     });
 });
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');

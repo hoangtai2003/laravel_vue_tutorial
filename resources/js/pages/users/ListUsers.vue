@@ -47,10 +47,10 @@
                             <th>Action</th>
                         </tr>
                         </thead>
-                        <tbody v-if="users.data.length > 0">
+                        <tbody v-if="users.length > 0">
                             <!-- @: dùng để lắng nghe sự kiện sự kiện từ component con và gọi lại trong component cha (giống với v-on) -->
                             <!-- : Được dùng để truyền prop vào component con (giống với v-bind) -->
-                            <ListUserItems v-for="(user, index) in users.data"
+                            <ListUserItems v-for="(user, index) in users"
                                            :key="user.id"
                                            :index=index
                                            :user=user
@@ -121,7 +121,7 @@ import ListUserItems from "@/pages/users/ListUserItems.vue";
 
 const index = ref(null);
 const toastr = useToastr();
-const users = ref({'data':[]})
+const users = ref([])
 const editing = ref(false)
 const formValues = ref({
     name: '',
@@ -131,8 +131,8 @@ const formValues = ref({
 const selectedUsers = ref([]);
 const searchQuery = ref(null)
 const selectAll = ref(false)
-const getUser = (page = 1) => {
-    axios.get(`/api/users/list?page=${page}`)
+const getUser = () => {
+    axios.get('/api/users/list')
         // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
         .then((response) => {
             users.value = response.data

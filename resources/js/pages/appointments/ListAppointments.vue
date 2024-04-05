@@ -22,9 +22,7 @@
                 <div class="col-lg-12">
                     <div class="d-flex justify-content-between mb-2">
                         <div>
-
-                                <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Appointment</button>
-
+                            <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Appointment</button>
                         </div>
                         <div class="btn-group">
                             <button  type="button" class="btn btn-secondary">
@@ -56,13 +54,13 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr >
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                <tr v-for="(appointment, index) in appointments" :key="appointment.id">
+                                    <td>{{ index + 1 }}</td>
+                                    <td>{{ appointment.client.first_name }} {{appointment.client.last_name}}</td>
+                                    <td>{{ appointment.start_time }}</td>
+                                    <td>{{ appointment.end_time }}</td>
                                     <td>
-                                            <span class="badge badge-success" >closed</span>
+                                            <span class="badge" :class="`badge-${appointment.status.color}`">{{ appointment.status.name }}</span>
                                     </td>
                                     <td>
                                         <a href="#">
@@ -86,4 +84,14 @@
 
 </template>
 <script setup>
+import axios from "axios";
+import {onMounted, ref} from "vue";
+const appointments = ref([])
+const getAppointment = async () => {
+    const response = await axios.get('/api/appointments/list')
+    appointments.value = response.data
+}
+onMounted(()=> {
+    getAppointment()
+})
 </script>
