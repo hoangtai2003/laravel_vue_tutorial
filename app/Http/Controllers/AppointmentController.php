@@ -12,9 +12,7 @@ class AppointmentController extends Controller
             ->with('client:id,first_name,last_name')
             ->when(request('status'), function ($query){
                 return $query->where('status', AppointmentStatus::from(request('status')));
-            })
-            ->latest()
-            ->get()
+            })->latest()->get()
             // map() được gọi trên Collection để chuyển đổi từng phần tử
             // trong Collection thành một giá trị mới dựa trên hàm callback được cung cấp
             ->map(function ($appointment) {
@@ -29,5 +27,16 @@ class AppointmentController extends Controller
                     'client' => $appointment->client
                 ];
             });
+    }
+    public function getStatusWithCount() {
+        $cases = AppointmentStatus::cases();
+        return collect($cases)->map(function ($status){
+           return [
+             'name' => $status->name,
+             'value' => $status->value,
+             'count' => Appointment::where('status', $status->value)->count(),
+             'color' => AppointmentStatus::from($status->value)->color()
+           ];
+        });
     }
 }
