@@ -29,7 +29,10 @@ class AppointmentController extends Controller
             });
     }
     public function getStatusWithCount() {
+        // Lấy danh sách các trạng thái của cuộc hẹn từ hằng số AppointmentStatus thông qua phương thức cases()
         $cases = AppointmentStatus::cases();
+        // collect($cases) dùng để chuyển đổi các trạng thái thành một Collection để có thể sử dụng các phương thức của Collection
+        // map(function ($status) { ... }): Duyệt qua mỗi phần tử trong Collection hàm callback này trả về một mảng thông tin về mỗi trạng thái.
         return collect($cases)->map(function ($status){
            return [
              'name' => $status->name,
@@ -38,5 +41,16 @@ class AppointmentController extends Controller
              'color' => AppointmentStatus::from($status->value)->color()
            ];
         });
+    }
+    public function create (){
+        Appointment::create([
+            'title' => request('title'),
+            'client_id' => 1,
+            'start_time' => now(),
+            'end_time' => now(),
+            'description' => request('description'),
+            'status' => AppointmentStatus::SCHEDULED
+        ]);
+        return response()->json(['message' => 'Create Appointment Successfully']);
     }
 }

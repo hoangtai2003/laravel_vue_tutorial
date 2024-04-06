@@ -33,6 +33,7 @@ Route::prefix('api')->group(function () {
     Route::prefix('appointments')->group(function (){
        Route::get('list', [AppointmentController::class, 'list']);
        Route::get('appointment-status', [AppointmentController::class, 'getStatusWithCount']);
+       Route::post('create', [AppointmentController::class, 'create']);
     });
 });
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');

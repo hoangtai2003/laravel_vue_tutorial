@@ -22,7 +22,9 @@
                 <div class="col-lg-12">
                     <div class="d-flex justify-content-between mb-2">
                         <div>
-                            <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Appointment</button>
+                            <router-link to="/admin/appointments/create" class="btn btn-primary">
+                                <i class="fa fa-plus-circle mr-1"></i>Add New Appointment
+                            </router-link>
                         </div>
                         <div class="btn-group">
                             <button @click="getAppointment()" type="button" class="btn" :class="[typeof selectedStatus === 'undefined' ? 'btn-secondary' : 'btn-default']">
@@ -98,6 +100,7 @@ const getAppointmentStatus = () => {
 const getAppointment = async (status) => {
     selectedStatus.value = status
     const params = {};
+    // Kiểm tra status có tồn tại hay không, nếu có gán giá trị của status vào thuộc tính status trong đối tượng params
     if (status){
         params.status = status
     }
@@ -106,6 +109,7 @@ const getAppointment = async (status) => {
     })
     appointments.value = response.data
 }
+// ***
 const appointmentCount = computed(() => {
     return appointmentStatus.value.map(status => status.count).reduce((acc, value) => acc + value, 0)
 })
