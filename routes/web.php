@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ClientController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,6 +35,10 @@ Route::prefix('api')->group(function () {
        Route::get('list', [AppointmentController::class, 'list']);
        Route::get('appointment-status', [AppointmentController::class, 'getStatusWithCount']);
        Route::post('create', [AppointmentController::class, 'create']);
+    });
+    Route::prefix('clients')->group(function (){
+        Route::get('list', [ClientController::class, 'list']);
+
     });
 });
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');

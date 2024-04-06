@@ -42,9 +42,10 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="client">Client Name</label>
-                                            <select v-model="form.client_id" id="client" class="form-control">
-                                                <option></option>
+                                            <select v-model="form.client_id" id="client" class="form-control" :class="{'is-invalid': errors.client_id}">
+                                                <option v-for="client in clients" :value="client.id" :key="client.id">{{client.first_name}} {{client.last_name}}</option>
                                             </select>
+                                            <span class="invalid-feedback">{{ errors.client_id }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -52,13 +53,15 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="start-time">Start Time</label>
-                                            <input v-model="form.start_time"  type="date" class="form-control flatpickr" id="start-time">
+                                            <input v-model="form.start_time"  type="text" class="form-control flatpickr" :class="{'is-invalid': errors.start_time}" id="start-time">
+                                            <span class="invalid-feedback">{{ errors.start_time }}</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="end-time">End Time</label>
-                                            <input v-model="form.end_time" type="time" class="form-control flatpickr" id="end-time">
+                                            <input v-model="form.end_time" type="text" class="form-control flatpickr" :class="{'is-invalid': errors.end_time}" id="end-time">
+                                            <span class="invalid-feedback">{{ errors.end_time }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -78,12 +81,13 @@
     </div>
 </template>
 <script setup>
-import { reactive } from "vue";
+import {onMounted, reactive, ref} from "vue";
 import { Form } from "vee-validate";
 import axios from "axios";
 import { useToastr } from "@/toastr";
 import { useRouter} from "vue-router";
-
+import flatpickr from "flatpickr";
+import 'flatpickr/dist/themes/light.css';
 const toastr = useToastr()
 const router = useRouter()
 const form = reactive({
@@ -93,6 +97,7 @@ const form = reactive({
     end_time: '',
     description: ''
 })
+const clients = ref([])
 const handleSubmit = (values, actions) => {
     axios.post('/api/appointments/create', form)
         .then((response) => {
@@ -104,4 +109,16 @@ const handleSubmit = (values, actions) => {
         })
 
 }
+const getClient = async () => {
+    const response = await axios.get('/api/clients/list')
+    clients.value = response.data
+}
+onMounted(() => {
+    flatpickr (".flatpickr", {
+        enableTime: true,
+        dateFormat: 'Y-m-d h:i K',
+        defaultHour: 10,
+    });
+    getClient()
+})
 </script>
