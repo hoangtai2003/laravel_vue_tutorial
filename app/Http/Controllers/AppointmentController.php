@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
+use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
@@ -42,7 +43,11 @@ class AppointmentController extends Controller
            ];
         });
     }
-    public function create (){
+    public function create (Request $request){
+        $request->validate([
+           'title' => 'required',
+           'description' => 'required'
+        ]);
         Appointment::create([
             'title' => request('title'),
             'client_id' => 1,
