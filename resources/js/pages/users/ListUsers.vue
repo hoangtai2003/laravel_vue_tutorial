@@ -54,8 +54,8 @@
                                            :key="user.id"
                                            :index=index
                                            :user=user
+                                           @confirm-delete-user="confirmDeleteUser"
                                            @edit-user="editUser"
-                                           @user-deleted="userDeleted"
                                            @toggle-selection="toggleSelection"
                                            :select-all="selectAll"/>
                         </tbody>
@@ -111,6 +111,28 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">
+                        <span>Delete User</span>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete this user ?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button @click.prevent="deleteUser" type="button" class="btn btn-primary">Delete User</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 <script setup>
 import axios from "axios";
@@ -131,6 +153,7 @@ const formValues = ref({
 const selectedUsers = ref([]);
 const searchQuery = ref(null)
 const selectAll = ref(false)
+const userIdBeingDeleted = ref(null)
 const getUser = () => {
     axios.get('/api/users/list')
         // Sau khi nhận được respone thì gán giá trị response vào users thông qua .value
@@ -185,9 +208,21 @@ const handleSubmit = (values) => {
         createUser(values)
     }
 }
-const userDeleted = (userId) => {
-    // Kiểm tra xem id của người dùng hiện tại có trùng với id cần xóa hay không nếu có sẽ giữ lại nếu không sẽ loại bỏ khỏi mảng
-    users.value = users.value.filter(user => user.id !== userId);
+const confirmDeleteUser = (id) => {
+    //Đặt giá trị userIdBeingDeleted thành id của người dùng cần xóa
+    userIdBeingDeleted.value = id
+    $('#deleteUserModal').modal('show')
+}
+const deleteUser = () => {
+    axios.delete(`/api/users/destroy/${userIdBeingDeleted.value}`)
+        .then(response => {
+            users.value = users.value.filter(user => user.id !== userIdBeingDeleted.value);
+            getUser()
+            $('#deleteUserModal').modal('hide')
+            toastr.success("Delete user successfully!")
+        }).catch(error => {
+        toastr.error("Error deleting user")
+    });
 }
 const search = () => {
     axios.get('/api/users/search', {

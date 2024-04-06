@@ -16,34 +16,11 @@
             <a href="#" @click.prevent="editUser(user)">
                 <i class="fa fa-edit"></i>
             </a>
-            <a href="#" @click.prevent="confirmDeleteUser(user)">
+            <a href="#" @click.prevent="emit('confirmDeleteUser', user.id)">
                 <i class="fa fa-trash text-danger ml-2"></i>
             </a>
         </td>
     </tr>
-    <div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
-         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">
-                        <span>Delete User</span>
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h5>Are you sure you want to delete this user ?</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button @click.prevent="deleteUser" type="button" class="btn btn-primary">Delete User</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </template>
 <script setup>
 import axios from "axios";
@@ -67,27 +44,9 @@ const roles = ref([
 ])
 const users = ref([])
 const toastr = useToastr();
-const userIdBeingDeleted = ref(null)
-const emit = defineEmits(['userDeleted', 'editUser', 'toggleSelection'])
+const emit = defineEmits(['editUser', 'toggleSelection', 'confirmDeleteUser'])
 const toggleSelection = () => {
-
     emit('toggleSelection', props.user)
-}
-const confirmDeleteUser = (user) => {
-    //Đặt giá trị userIdBeingDeleted thành id của người dùng cần xóa
-    userIdBeingDeleted.value = user.id
-    $('#deleteUserModal').modal('show')
-}
-const deleteUser = () => {
-    axios.delete(`/api/users/destroy/${userIdBeingDeleted.value}`)
-        .then(response => {
-            getUser()
-            $('#deleteUserModal').modal('hide')
-            toastr.success("Delete user successfully!")
-            emit("userDeleted", userIdBeingDeleted.value)
-        }).catch(error => {
-        toastr.error("Error deleting user")
-    });
 }
 const getUser = () => {
     axios.get('/api/users/list')
