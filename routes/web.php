@@ -44,7 +44,7 @@ Route::middleware('auth')->group(function (){
         });
         Route::prefix('dashboard')->group(function (){
             Route::get('appointments', [DashboardController::class, 'appointments']);
-
+            Route::get('users', [DashboardController::class, 'users']);
         });
     });
 });
