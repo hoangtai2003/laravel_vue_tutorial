@@ -68,9 +68,9 @@
                                             <i class="fa fa-edit mr-2 text-primary"></i>
                                         </router-link>
 
-                                        <router-link :to="`/admin/appointments/${appointment.id}/delete`" @click="deleteAppointment">
+                                        <a href="#" @click="deleteAppointment(appointment.id)">
                                             <i class="fa fa-trash text-danger"></i>
-                                        </router-link>
+                                        </a>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -88,7 +88,7 @@
 import axios from "axios";
 import {computed, onMounted, ref} from "vue";
 import { useRouter,useRoute} from "vue-router";
-
+import Swal from "sweetalert2";
 const appointments = ref([])
 const appointmentStatus = ref([])
 const selectedStatus = ref()
@@ -113,12 +113,28 @@ const getAppointment = async (status) => {
     })
     appointments.value = response.data
 }
-const deleteAppointment = () => {
-    axios.delete(`/api/appointments/${appointment.id}/delete`)
-        .then((response) => {
-            router.push('/admin/appointments')
-            toastr.success(response.data.message)
-        })
+const deleteAppointment = (id) => {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(`/api/appointments/${id}/delete`)
+                .then((response) => {
+                    appointments.value = appointments.value.filter(appointment => appointment.id !== id)
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                    });
+                })
+        }
+    });
 }
 // ***
 const appointmentCount = computed(() => {
