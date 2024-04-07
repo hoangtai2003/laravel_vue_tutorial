@@ -219,12 +219,15 @@
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link to="" class="nav-link">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>
-                                Logout
-                            </p>
-                        </router-link>
+                        <form method="POST" action="{{route('logout')}}" class="nav-link">
+                            @csrf
+                            <a href="" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <i class="nav-icon fas fa-sign-out-alt"></i>
+                                <p>
+                                    Logout
+                                </p>
+                            </a>
+                        </form>
                     </li>
                 </ul>
             </nav>
@@ -238,7 +241,7 @@
     </div>
 
     <footer class="main-footer">
-        <strong></strong>Hoàng Đức Tài
+        <strong>Hoàng Đức Tài</strong>
     </footer>
 </div>
 </body>

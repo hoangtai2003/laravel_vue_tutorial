@@ -16,32 +16,32 @@ use App\Http\Controllers\ClientController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::redirect('/', '/login');
+Route::middleware('auth')->group(function (){
+    Route::prefix('api')->group(function () {
+        Route::prefix('users')->group(function (){
+            Route::get('list', [UserController::class, 'index']);
+            Route::post('create', [UserController::class, 'create']);
+            Route::put('update/{user}', [UserController::class, 'update']);
+            Route::delete('destroy/{user}', [UserController::class, 'destroy']);
+            Route::patch('change-role/{user}', [UserController::class, 'changeRole']);
+            Route::get('search', [UserController::class, 'search']);
+            Route::delete('', [UserController::class, 'bulkDelete']);
+        });
+
+        Route::prefix('appointments')->group(function (){
+            Route::get('list', [AppointmentController::class, 'list']);
+            Route::get('appointment-status', [AppointmentController::class, 'getStatusWithCount']);
+            Route::post('create', [AppointmentController::class, 'create']);
+            Route::get('{appointment}/edit', [AppointmentController::class, 'edit']);
+            Route::put('{appointment}/update', [AppointmentController::class, 'update']);
+            Route::delete('{appointment}/delete', [AppointmentController::class, 'delete']);
+        });
+        Route::prefix('clients')->group(function (){
+            Route::get('list', [ClientController::class, 'list']);
+
+        });
+    });
 });
 
-Route::prefix('api')->group(function () {
-    Route::prefix('users')->group(function (){
-        Route::get('list', [UserController::class, 'index']);
-        Route::post('create', [UserController::class, 'create']);
-        Route::put('update/{user}', [UserController::class, 'update']);
-        Route::delete('destroy/{user}', [UserController::class, 'destroy']);
-        Route::patch('change-role/{user}', [UserController::class, 'changeRole']);
-        Route::get('search', [UserController::class, 'search']);
-        Route::delete('', [UserController::class, 'bulkDelete']);
-    });
-
-    Route::prefix('appointments')->group(function (){
-       Route::get('list', [AppointmentController::class, 'list']);
-       Route::get('appointment-status', [AppointmentController::class, 'getStatusWithCount']);
-       Route::post('create', [AppointmentController::class, 'create']);
-       Route::get('{appointment}/edit', [AppointmentController::class, 'edit']);
-       Route::put('{appointment}/update', [AppointmentController::class, 'update']);
-       Route::delete('{appointment}/delete', [AppointmentController::class, 'delete']);
-    });
-    Route::prefix('clients')->group(function (){
-        Route::get('list', [ClientController::class, 'list']);
-
-    });
-});
-Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
+Route::get('{view}', ApplicationController::class)->where('view', '(.*)')->middleware('auth');
