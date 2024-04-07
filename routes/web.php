@@ -35,6 +35,9 @@ Route::prefix('api')->group(function () {
        Route::get('list', [AppointmentController::class, 'list']);
        Route::get('appointment-status', [AppointmentController::class, 'getStatusWithCount']);
        Route::post('create', [AppointmentController::class, 'create']);
+       Route::get('{appointment}/edit', [AppointmentController::class, 'edit']);
+       Route::put('{appointment}/update', [AppointmentController::class, 'update']);
+       Route::delete('{appointment}/delete', [AppointmentController::class, 'delete']);
     });
     Route::prefix('clients')->group(function (){
         Route::get('list', [ClientController::class, 'list']);

@@ -64,13 +64,13 @@
                                             <span class="badge" :class="`badge-${appointment.status.color}`">{{ appointment.status.name }}</span>
                                     </td>
                                     <td>
-                                        <a href="#">
+                                        <router-link :to="`/admin/appointments/${appointment.id}/edit`">
                                             <i class="fa fa-edit mr-2 text-primary"></i>
-                                        </a>
+                                        </router-link>
 
-                                        <a href="#">
+                                        <router-link :to="`/admin/appointments/${appointment.id}/delete`" @click="deleteAppointment">
                                             <i class="fa fa-trash text-danger"></i>
-                                        </a>
+                                        </router-link>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -87,9 +87,13 @@
 <script setup>
 import axios from "axios";
 import {computed, onMounted, ref} from "vue";
+import { useRouter,useRoute} from "vue-router";
+
 const appointments = ref([])
 const appointmentStatus = ref([])
 const selectedStatus = ref()
+const router = useRouter()
+const route = useRoute()
 const getAppointmentStatus = () => {
     axios.get('/api/appointments/appointment-status')
         .then((response) => {
@@ -108,6 +112,13 @@ const getAppointment = async (status) => {
         params: params
     })
     appointments.value = response.data
+}
+const deleteAppointment = () => {
+    axios.delete(`/api/appointments/${appointment.id}/delete`)
+        .then((response) => {
+            router.push('/admin/appointments')
+            toastr.success(response.data.message)
+        })
 }
 // ***
 const appointmentCount = computed(() => {

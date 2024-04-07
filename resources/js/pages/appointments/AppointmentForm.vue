@@ -4,7 +4,8 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">
-                        <span>Create</span>
+                        <span v-if="editMode">Edit</span>
+                        <span v-else>Create</span>
                         Appointment</h1>
                 </div>
                 <div class="col-sm-6">
@@ -16,7 +17,8 @@
                             <router-link to="/admin/appointments">Appointments</router-link>
                         </li>
                         <li class="breadcrumb-item active">
-                            <span>Create</span>
+                            <span v-if="editMode">Edit</span>
+                            <span v-else>Create</span>
                         </li>
                     </ol>
                 </div>
@@ -85,11 +87,12 @@ import {onMounted, reactive, ref} from "vue";
 import { Form } from "vee-validate";
 import axios from "axios";
 import { useToastr } from "@/toastr";
-import { useRouter} from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import flatpickr from "flatpickr";
 import 'flatpickr/dist/themes/light.css';
 const toastr = useToastr()
 const router = useRouter()
+const route = useRoute()
 const form = reactive({
     title: '',
     client_id: '',
@@ -98,22 +101,53 @@ const form = reactive({
     description: ''
 })
 const clients = ref([])
-const handleSubmit = (values, actions) => {
+const editMode = ref(false)
+const handleSubmit = (values) => {
+    if (editMode.value){
+        updateAppointment(values)
+    } else {
+        createAppointment(values)
+    }
+}
+const createAppointment = () => {
     axios.post('/api/appointments/create', form)
         .then((response) => {
             router.push('/admin/appointments')
-            toastr.success("Create Appointment Successfully")
+            toastr.success(response.data.message)
         })
         .catch((error) => {
-            actions.setErrors(error.response.data.errors);
+            toastr.error("Appointment creation fails")
         })
-
+}
+const updateAppointment = () => {
+    axios.put(`/api/appointments/${route.params.id}/update`, form)
+        .then((response) => {
+            router.push('/admin/appointments')
+            toastr.success(response.data.message)
+        })
+        .catch((error) => {
+            toastr.error("Appointment update fails")
+        })
 }
 const getClient = async () => {
     const response = await axios.get('/api/clients/list')
     clients.value = response.data
 }
+const getAppointment = () => {
+    axios.get(`/api/appointments/${route.params.id}/edit`)
+        .then((response) => {
+            form.title = response.data.title
+            form.client_id = response.data.client_id
+            form.start_time = response.data.formatted_start_time
+            form.end_time = response.data.formatted_end_time
+            form.description = response.data.description
+        })
+}
 onMounted(() => {
+    if (route.name === 'admin.appointments.edit'){
+        editMode.value = true
+        getAppointment()
+    }
     flatpickr (".flatpickr", {
         enableTime: true,
         dateFormat: 'Y-m-d h:i K',

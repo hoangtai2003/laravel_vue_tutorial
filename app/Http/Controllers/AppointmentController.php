@@ -63,4 +63,25 @@ class AppointmentController extends Controller
         ]);
         return response()->json(['message' => 'Create Appointment Successfully']);
     }
+
+    public function edit(Appointment $appointment){
+        return $appointment;
+    }
+    public function update(Request $request, Appointment $appointment){
+        $validated = $request->validate([
+            'client_id' => 'required',
+            'title' => 'required',
+            'description' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required'
+        ], [
+            'client_id.required' => 'The client name field is required'
+        ]);
+        $appointment->update($validated);
+        return response()->json(['message' => 'Update Appointment Successfully']);
+    }
+    public function delete(Appointment $appointment){
+        $appointment->delete();
+        return response()->json(['message' => 'Delete Appointment Successfully']);
+    }
 }
