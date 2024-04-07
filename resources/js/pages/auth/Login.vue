@@ -7,6 +7,9 @@
             </div>
             <div class="card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
+                <div v-if="errorMessage" class="alert alert-danger" role="alert">
+                    {{errorMessage}}
+                </div>
                 <form @submit.prevent="handleSubmit">
                     <div class="input-group mb-3">
                         <input v-model="form.email" type="email" class="form-control" placeholder="Email">
@@ -34,32 +37,40 @@
                         </div>
 
                         <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <div v-if="loading" class="spinner-border text-light spinner-border-sm" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <span v-else >Sign in</span></button>
                         </div>
 
                     </div>
                 </form>
-
-                <p class="mb-1">
-                    <a href="forgot-password.html">I forgot my password</a>
-                </p>
             </div>
 
         </div>
     </div>
 </template>
 <script setup>
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 import axios from "axios";
-
+const errorMessage = ref('')
+const loading = ref(false)
 const form = reactive({
     email: '',
     password: '',
 })
 const handleSubmit = () => {
+    loading.value = true
     axios.post('/login', form)
         .then(() => {
             window.location.href = '/admin/dashboard';
+        })
+        .catch((error) => {
+            errorMessage.value = error.response.data.message;
+        })
+        .finally(() => {
+            loading.value = false
         })
 }
 </script>
