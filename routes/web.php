@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SettingController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,6 +46,10 @@ Route::middleware('auth')->group(function (){
         Route::prefix('dashboard')->group(function (){
             Route::get('appointments', [DashboardController::class, 'appointments']);
             Route::get('users', [DashboardController::class, 'users']);
+        });
+        Route::prefix('settings')->group(function (){
+            Route::get('list', [SettingController::class, 'list']);
+            Route::put('update', [SettingController::class, 'update']);
         });
     });
 });
