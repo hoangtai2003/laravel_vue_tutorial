@@ -7,6 +7,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -50,6 +51,10 @@ Route::middleware('auth')->group(function (){
         Route::prefix('settings')->group(function (){
             Route::get('list', [SettingController::class, 'list']);
             Route::put('update', [SettingController::class, 'update']);
+        });
+        Route::prefix('profile')->group(function (){
+            Route::get('users', [ProfileController::class, 'user']);
+            Route::put('update', [ProfileController::class, 'update']);
         });
     });
 });
