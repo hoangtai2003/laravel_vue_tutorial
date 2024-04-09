@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function (){
         Route::prefix('profile')->group(function (){
             Route::get('users', [ProfileController::class, 'user']);
             Route::put('update', [ProfileController::class, 'update']);
+            Route::post('upload-profile-image', [ProfileController::class, 'uploadImage']);
+            Route::post('change-user-password', [ProfileController::class, 'changePassword']);
         });
     });
 });

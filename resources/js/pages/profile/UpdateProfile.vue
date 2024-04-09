@@ -22,10 +22,9 @@
                 <div class="card card-primary card-outline">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            <input type="file" class="d-none">
-                            <img class="profile-user-img img-circle" src="/noimage.png" alt="User profile picture">
+                            <input @change="handleFileChange" ref="fileInput" type="file" class="d-none">
+                            <img @click="openFileInput" class="profile-user-img img-circle" :src="profilePictureUrl ? profilePictureUrl : form.avatar" alt="User profile picture">
                         </div>
-
                         <h3 class="profile-username text-center">{{form.name}}</h3>
                         <p class="text-muted text-center">{{form.role}}</p>
                     </div>
@@ -68,26 +67,29 @@
                             </div>
 
                             <div class="tab-pane" id="changePassword">
-                                <form class="form-horizontal">
+                                <form class="form-horizontal" @submit.prevent="handleChangePassword">
                                     <div class="form-group row">
                                         <label for="currentPassword" class="col-sm-3 col-form-label">Current
                                             Password</label>
                                         <div class="col-sm-9">
-                                            <input type="password" class="form-control " id="currentPassword" placeholder="Current Password">
+                                            <input v-model="changePasswordForm.currentPassword" type="password" class="form-control " id="currentPassword" placeholder="Current Password">
+                                            <span class="text-danger text-sm" v-if="errors && errors.currentPassword">{{errors.currentPassword[0]}}</span>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="newPassword" class="col-sm-3 col-form-label">New
                                             Password</label>
                                         <div class="col-sm-9">
-                                            <input type="password" class="form-control " id="newPassword" placeholder="New Password">
+                                            <input v-model="changePasswordForm.password" type="password" class="form-control " id="newPassword" placeholder="New Password">
+                                            <span class="text-danger text-sm" v-if="errors && errors.password">{{errors.password[0]}}</span>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="passwordConfirmation" class="col-sm-3 col-form-label">Confirm
                                             New Password</label>
                                         <div class="col-sm-9">
-                                            <input type="password" class="form-control " id="passwordConfirmation" placeholder="Confirm New Password">
+                                            <input v-model="changePasswordForm.passwordConfirmation" type="password" class="form-control " id="passwordConfirmation" placeholder="Confirm New Password">
+                                            <span class="text-danger text-sm" v-if="errors && errors.passwordConfirmation">{{errors.passwordConfirmation[0]}}</span>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -105,7 +107,7 @@
     </div>
 </template>
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import axios from "axios";
 import {useToastr} from "@/toastr";
 const errors = ref()
@@ -132,7 +134,49 @@ const updateUser = () => {
         }
     })
 }
+const fileInput = ref(null)
+const openFileInput = () => {
+    fileInput.value.click()
+}
+const profilePictureUrl = ref(null)
+const handleFileChange = (event) => {
+    const file = event.target.files[0]
+    profilePictureUrl.value = URL.createObjectURL(file)
+    console.log(profilePictureUrl.value)
+
+    const formData = new FormData();
+    formData.append('profile_picture', file)
+    axios.post('/api/profile/upload-profile-image', formData)
+        .then((response) => {
+            toastr.success("Image uploaded successfully!")
+        })
+}
+const changePasswordForm = reactive({
+    currentPassword: '',
+    password: '',
+    passwordConfirmation: ''
+})
+const handleChangePassword = () => {
+    errors.value = '';
+    axios.post('/api/profile/change-user-password', changePasswordForm)
+        .then((response) => {
+            toastr.success(response.data.message)
+            for (const field in changePasswordForm){
+                changePasswordForm[field] = '';
+            }
+        }).catch((error) => {
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors;
+        }
+    });
+}
 onMounted(() => {
     getUsers();
 })
 </script>
+<style>
+.profile-user-img:hover {
+    background-color: blue;
+    cursor: pointer;
+}
+</style>
