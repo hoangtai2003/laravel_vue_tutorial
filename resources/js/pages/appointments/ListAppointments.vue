@@ -113,6 +113,11 @@ const getAppointment = async (status) => {
     })
     appointments.value = response.data
 }
+const updateAppointmentStatusCount = (id) => {
+    const deletedAppointmentStatus = appointments.value.find(appointment => appointment.id === id).status.name;
+    const statusToUpdate = appointmentStatus.value.find(status => status.name === deletedAppointmentStatus);
+    statusToUpdate.count--;
+};
 const deleteAppointment = (id) => {
     Swal.fire({
         title: "Are you sure?",
@@ -126,6 +131,7 @@ const deleteAppointment = (id) => {
         if (result.isConfirmed) {
             axios.delete(`/api/appointments/${id}/delete`)
                 .then((response) => {
+                    updateAppointmentStatusCount(id)
                     appointments.value = appointments.value.filter(appointment => appointment.id !== id)
                     Swal.fire({
                         title: "Deleted!",

@@ -19,8 +19,8 @@ class AppointmentController extends Controller
             ->map(function ($appointment) {
                 return [
                     'id' => $appointment->id,
-                    'start_time' => $appointment->start_time->format('Y-m-d h:i A'),
-                    'end_time' => $appointment->end_time->format('Y-m-d h:i A'),
+                    'start_time' => $appointment->formatted_start_time,
+                    'end_time' => $appointment->formatted_end_time,
                     'status' => [
                         'name' => $appointment->status->name,
                         'color' => $appointment->status->color()
@@ -46,8 +46,8 @@ class AppointmentController extends Controller
     public function create (Request $request){
         $validated = $request->validate([
             'client_id' => 'required',
-           'title' => 'required',
-           'description' => 'required',
+            'title' => 'required',
+            'description' => 'required',
             'start_time' => 'required',
             'end_time' => 'required'
         ], [
@@ -77,6 +77,7 @@ class AppointmentController extends Controller
         ], [
             'client_id.required' => 'The client name field is required'
         ]);
+        // $appointment là một instance của models Appointment
         $appointment->update($validated);
         return response()->json(['message' => 'Update Appointment Successfully']);
     }
