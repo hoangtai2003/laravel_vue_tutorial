@@ -35,7 +35,7 @@ class UserController extends Controller
     }
 
     public function update(Request $request, User $user){
-        $request -> validate([
+        $request->validate([
             'name' => 'required',
             'email' => 'required|unique:users,email,'.$user->id,
             'password' => 'min:8|nullable',
@@ -48,12 +48,12 @@ class UserController extends Controller
         return $user;
     }
     public function destroy(User $user){
-        $user -> delete();
+        $user->delete();
         return response()->json(['message' => 'Product deleted successfully']);
     }
 
     public function changeRole(User $user){
-        $user -> update([
+        $user->update([
            'role' =>  request('role')
         ]);
         return response()->json(['success' => true]);
@@ -61,7 +61,7 @@ class UserController extends Controller
 
     public function search(){
         $querySearch = request('searchQuery');
-        $user = User::where('name', 'like', "%{$querySearch}%");
+        $user = User::where('name', 'like', "%{$querySearch}%")->get();
 
         return response()->json($user);
     }

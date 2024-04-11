@@ -17,7 +17,7 @@ class SettingController extends Controller
     }
     public function update(Request $request) {
         $settings = $request->validate([
-           'app_name' => ['required', 'string'],
+            'app_name' => ['required', 'string'],
             'date_format' => ['required', 'string'],
             'pagination_limit' => ['required', 'int','min:1','max:100']
         ]);

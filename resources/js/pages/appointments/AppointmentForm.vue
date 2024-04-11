@@ -121,17 +121,20 @@ const createAppointment = () => {
             if (error.response && error.response.status === 422) {
                 errors.value = error.response.data.errors;
             }
-            console.log(errors.value.title)
             toastr.error("Appointment creation fails")
         })
 }
 const updateAppointment = () => {
+    errors.value = ''
     axios.put(`/api/appointments/${route.params.id}/update`, form)
         .then((response) => {
             router.push('/admin/appointments')
             toastr.success(response.data.message)
         })
         .catch((error) => {
+            if (error.response && error.response.status === 422) {
+                errors.value = error.response.data.errors;
+            }
             toastr.error("Appointment update fails")
         })
 }
