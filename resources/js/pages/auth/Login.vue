@@ -43,7 +43,6 @@
                                 </div>
                                 <span v-else >Sign in</span></button>
                         </div>
-
                     </div>
                 </form>
             </div>
@@ -52,19 +51,24 @@
     </div>
 </template>
 <script setup>
-import {reactive, ref} from "vue";
+import {reactive, ref, inject} from "vue";
 import axios from "axios";
+
 const errorMessage = ref('')
 const loading = ref(false)
 const form = reactive({
     email: '',
     password: '',
 })
+let cookies = inject('cookies')
 const handleSubmit = () => {
     loading.value = true
-    axios.post('/login', form)
-        .then(() => {
-            window.location.href = '/admin/dashboard';
+    axios.post('/api/auth/login', form)
+        .then((response) => {
+            if (response.data.access_token) {
+                cookies.set('access_token', response.data.access_token)
+                window.location.href = '/admin/dashboard';
+            }
         })
         .catch((error) => {
             errorMessage.value = error.response.data.message;

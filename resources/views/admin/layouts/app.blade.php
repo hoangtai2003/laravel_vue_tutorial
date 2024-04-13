@@ -219,7 +219,7 @@
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <form method="POST" action="{{route('logout')}}" class="nav-link">
+                        <form method="POST" action="" class="nav-link">
                             @csrf
                             <a href="" onclick="event.preventDefault(); this.closest('form').submit();">
                                 <i class="nav-icon fas fa-sign-out-alt"></i>
@@ -244,24 +244,5 @@
         <strong>Hoàng Đức Tài</strong>
     </footer>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const toggleMenuIcon = document.getElementById('toggleMenuIcon');
-        const body = document.querySelector('body');
-
-        toggleMenuIcon.addEventListener('click', () => {
-            if (body.classList.contains('sidebar-collapse')) {
-                localStorage.setItem('sidebarState', 'expanded');
-            } else {
-                localStorage.setItem('sidebarState', 'collapsed');
-            }
-        });
-
-        const sidebarState = localStorage.getItem('sidebarState');
-        if (sidebarState === 'collapsed') {
-            body.classList.add('sidebar-collapse');
-        }
-    });
-</script>
 </body>
 </html>
