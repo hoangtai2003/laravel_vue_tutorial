@@ -51,27 +51,51 @@
     </div>
 </template>
 <script setup>
-import {reactive, ref, inject} from "vue";
+import {reactive, ref} from "vue";
 import axios from "axios";
+import {useStore} from "vuex";
+import {useRouter} from "vue-router";
+import { onMounted } from 'vue';
 
 const errorMessage = ref('')
 const loading = ref(false)
+const router = useRouter()
+const store = useStore()
 const form = reactive({
     email: '',
     password: '',
 })
-let cookies = inject('cookies')
+onMounted(() => {
+    if (store.state.token !== '') {
+        axios.post('/api/auth/checkToken', {
+            token: store.state.token
+        })
+            .then((response) => {
+                if (response) {
+                    loading.value = false;
+                    router.push('/admin/dashboard');
+                }
+            })
+            .catch((error) => {
+                loading.value = false;
+                store.commit('clearToken');
+            });
+    } else {
+        loading.value = false;
+    }
+});
 const handleSubmit = () => {
     loading.value = true
     axios.post('/api/auth/login', form)
         .then((response) => {
             if (response.data.access_token) {
-                cookies.set('access_token', response.data.access_token)
-                window.location.href = '/admin/dashboard';
+                localStorage.setItem('auth', response.data.access_token); // Lưu access_token vào localStorage
+                store.commit('setToken', response.data.access_token); // Cập nhật token trong store
+                // commit được sử dụng để gọi một mutation, tức là thay đổi trạng thái trong store
+                router.push('/admin/dashboard')
             }
         })
         .catch((error) => {
-            errorMessage.value = error.response.data.message;
         })
         .finally(() => {
             loading.value = false

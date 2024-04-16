@@ -237,7 +237,9 @@
     </aside>
 
     <div class="content-wrapper">
-        <router-view></router-view>
+        <router-view>
+
+        </router-view>
     </div>
 
     <footer class="main-footer">

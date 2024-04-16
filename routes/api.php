@@ -24,4 +24,5 @@ Route::prefix('auth')->group(function (){
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::post('/change-pass', [AuthController::class, 'changePassWord']);
+    Route::post('/checkToken', [AuthController::class, 'checkToken']);
 });

@@ -120,4 +120,8 @@ class AuthController extends Controller
             'user' => $user,
         ], 201);
     }
+    // Kiểm tra checkToken
+    public function checkToken(){
+         return response()->json(['success'=>true], 200);
+    }
 }
