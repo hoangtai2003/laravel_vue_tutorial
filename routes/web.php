@@ -8,6 +8,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,7 +20,6 @@ use App\Http\Controllers\ProfileController;
 |
 */
 
-Route::redirect('/', '/login');
 //Route::middleware('auth')->group(function (){
 Route::prefix('api')->group(function () {
     Route::prefix('users')->group(function (){
@@ -60,5 +60,4 @@ Route::prefix('api')->group(function () {
     });
 });
 //});
-
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');

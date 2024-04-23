@@ -16,11 +16,7 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function login (Request $request){
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -34,9 +30,10 @@ class AuthController extends Controller
         if (! $token = auth()->attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        return $this->createNewToken($token);
+        $token = $this->createNewToken($token);
+        return view('admin.layouts.app', compact('token'));
     }
+
     /**
      * Register a User.
      *
@@ -119,9 +116,5 @@ class AuthController extends Controller
             'message' => 'User successfully changed password',
             'user' => $user,
         ], 201);
-    }
-    // Kiểm tra checkToken
-    public function checkToken(){
-         return response()->json(['success'=>true], 200);
     }
 }
