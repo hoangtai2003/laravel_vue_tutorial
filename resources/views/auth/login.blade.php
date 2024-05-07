@@ -16,7 +16,8 @@
                 <a href="#" class="h1"><b>Admin</b>Login</a>
             </div>
             <div class="card-body">
-                <form method="post" action="{{route('api.login')}}">
+                <form method="POST" action="{{route('handleLogin')}}">
+                    @csrf
                     <div class="input-group mb-3">
                         <input type="email" class="form-control" placeholder="Email" name="email" required>
                         <div class="input-group-append">
@@ -41,7 +42,6 @@
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
 </body>

@@ -31,9 +31,8 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $token = $this->createNewToken($token);
-        return view('admin.layouts.app', compact('token'));
+        return redirect('/admin/dashboard')->with('token', $token);
     }
-
     /**
      * Register a User.
      *
@@ -58,29 +57,15 @@ class AuthController extends Controller
             'user' => $user
         ], 201);
     }
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
      public function logout(){
          auth()->logout();
-         return response()->json(['message' => 'User successfully signed out']);
+         return redirect('/login');
      }
 
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
      public function refresh (){
          return $this->createNewToken(auth()->refresh());
      }
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     protected function createNewToken($token){
         return response()->json([
             'access_token' => $token,
@@ -89,14 +74,11 @@ class AuthController extends Controller
             'user' => auth()->user()
         ]);
     }
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
      public function userProfile(){
          return response()->json(auth()->user());
      }
+
     public function changePassWord(Request $request) {
         $validator = Validator::make($request->all(), [
             'old_password' => 'required|string|min:8',
